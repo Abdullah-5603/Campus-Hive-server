@@ -54,8 +54,24 @@ app.get('/all-users', async (req, res) => {
 
 app.get('/current-user', async (req, res) => {
     const email = req.query.email;
-    const query = { email: email }
+    const query = { primaryEmail: email }
     const result = await usersCollection.findOne(query)
+    res.send(result)
+})
+
+app.put('/update-profile', async (req, res) => {
+    const profileData = req.body;
+    const id = req.query.id
+    const query = {_id : new ObjectId(id)}
+    const updatedDoc = {
+        $set : {
+            name : profileData.name,
+            secondaryEmail : profileData.email,
+            university : profileData.university,
+            address : profileData.address
+        }
+    }
+    const result = await usersCollection.updateOne(query, updatedDoc)
     res.send(result)
 })
 
