@@ -33,6 +33,7 @@ dbConnect()
 const usersCollection = client.db('CampusHive').collection('users')
 const collegeCollection = client.db('CampusHive').collection('colleges')
 const candidateCollection = client.db('CampusHive').collection('candidates')
+const reviewCollection = client.db('CampusHive').collection('reviews')
 
 // users api
 
@@ -83,6 +84,13 @@ app.post('/candidates', async (req, res) => {
     res.send(result)
 })
 
+app.get('/candidates', async (req, res) => {
+    const email = req.query.email;
+    const query = { email: email }
+    const result = await candidateCollection.find(query).toArray()
+    res.send(result)
+})
+
 // college api
 
 app.get('/all-colleges', async (req, res) => {
@@ -95,6 +103,33 @@ app.get('/all-colleges/:id', async (req, res) => {
     const query = {_id : new ObjectId(id)}
     const result = await collegeCollection.findOne(query)
     res.send(result);
+})
+
+app.get('/search-colleges/:searchText', async (req, res) => {
+    try {
+      const text = req.params.searchText;
+      console.log(text);
+      const result = await collegeCollection.find({
+        $or : [
+          {name : {$regex : text, $options: "i"}}
+        ]
+      }).toArray();
+      res.send(result)        
+    } catch (error) {
+      req.send(error.message)
+    }
+  })
+
+// review api
+
+app.post('/reviews', async (req, res) => {
+    const review = req.body;
+    const result = await reviewCollection.insertOne(review)
+    res.send(result)
+})
+app.get('/reviews', async (req, res) => {
+    const result = await reviewCollection.find().toArray()
+    res.send(result)
 })
 
 app.get('/', (req, res) => {
