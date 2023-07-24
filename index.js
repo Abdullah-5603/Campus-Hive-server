@@ -39,7 +39,7 @@ const reviewCollection = client.db('CampusHive').collection('reviews')
 
 app.post('/all-users', async (req, res) => {
     const user = req.body;
-    const query = { email: user?.email }
+    const query = { primaryEmail : user?.email }
     const existingUser = await usersCollection.findOne(query);
     if (existingUser) {
         return res.send({})
@@ -85,9 +85,9 @@ app.post('/candidates', async (req, res) => {
 })
 
 app.get('/candidates', async (req, res) => {
-    const email = req.query.email;
-    const query = { email: email }
-    const result = await candidateCollection.find(query).toArray()
+    // const email = req.query.email;
+    // const query = { email: email }
+    const result = await candidateCollection.find().toArray()
     res.send(result)
 })
 
@@ -108,7 +108,6 @@ app.get('/all-colleges/:id', async (req, res) => {
 app.get('/search-colleges/:searchText', async (req, res) => {
     try {
       const text = req.params.searchText;
-      console.log(text);
       const result = await collegeCollection.find({
         $or : [
           {name : {$regex : text, $options: "i"}}
